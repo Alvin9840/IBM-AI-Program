@@ -25,12 +25,12 @@ def main():
     
     # Example interactions
     example_queries = [
-        "Summarize what fans are saying about our last game and suggest some content hooks",
-        "What are fans saying about the Lakers vs Warriors game?",
-        "Generate content hooks based on recent performances",
-        "Analyze future trends and forecast fan behavior for next month",
-        "Suggest events based on current fan sentiment",
-        "What should we do next based on the prediction?"
+        "How are the Lakers performing right now?",
+        "Whos likely to win the next NBA championship?",
+        "How do the Warrior match up against the top teams in the West?",
+        "What would fans say if the Orlando Magic won the NBA cup?",
+        "Show me historical sentiment patterns for comeback wins",
+        "Predict fan attendance for the next Wizards home game"
     ]
     
     print("💡 Example queries you can try:")
