@@ -3,6 +3,7 @@ Coordinator Agent - Uses IBM watsonx.ai for intelligent agent orchestration
 """
 
 import json
+import numpy as np
 from typing import Dict, List, Any
 from pathlib import Path
 
@@ -58,6 +59,20 @@ class CoordinatorAgent:
         with open(tools_file, 'r') as f:
             config = json.load(f)
         return config["tools"]
+    
+    def _make_serializable(self, obj: Any) -> Any:
+        """Convert numpy/pandas types to native Python types for JSON serialization"""
+        if isinstance(obj, (np.integer, np.int64, np.int32)):
+            return int(obj)
+        elif isinstance(obj, (np.floating, np.float64, np.float32)):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, dict):
+            return {k: self._make_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, (list, tuple)):
+            return [self._make_serializable(item) for item in obj]
+        return obj
     
     def process_director_request(self, request: str, max_iterations: int = 5) -> Dict[str, Any]:
         """
@@ -118,16 +133,25 @@ class CoordinatorAgent:
                 
                 result = self._execute_tool(tool_name, parameters)
                 
+                # Make result serializable before storing
+                serializable_result = self._make_serializable(result)
+                
                 if tool_name not in workflow_result["agent_results"]:
                     workflow_result["agent_results"][tool_name] = []
-                workflow_result["agent_results"][tool_name].append(result)
+                workflow_result["agent_results"][tool_name].append(serializable_result)
                 
-                tool_results.append({"tool": tool_name, "result": result})
+                tool_results.append({"tool": tool_name, "result": serializable_result})
             
-            # Add tool results to conversation
+            # Add tool results to conversation with safe serialization
+            try:
+                tool_content = json.dumps(tool_results, indent=2)
+            except (TypeError, ValueError) as e:
+                print(f"⚠️ Serialization warning: {e}")
+                tool_content = json.dumps(tool_results, indent=2, default=str)
+            
             self.conversation_history.append({
                 "role": "tool",
-                "content": json.dumps(tool_results, indent=2)
+                "content": tool_content
             })
         
         # Fallback if max iterations reached
@@ -230,6 +254,8 @@ class CoordinatorAgent:
                 
         except Exception as e:
             print(f"❌ Error executing tool {tool_name}: {e}")
+            import traceback
+            traceback.print_exc()
             return {"status": "error", "message": str(e)}
     
     def reset_conversation(self):

@@ -78,6 +78,10 @@ class DataTool:
     
     def get_recent_games(self, num_games: int = 10, team_name: Optional[str] = None) -> List[Dict[str, Any]]:
         """Get recent game results with detailed statistics."""
+        
+        # Type conversion: handle string numbers from AI agents
+        num_games = int(num_games) if isinstance(num_games, str) else num_games
+        
         _, team_id = self._resolve_team(team_name)
         
         def fetch():
@@ -175,6 +179,10 @@ class DataTool:
     
     def get_top_performers(self, num_games: int = 5, team_name: Optional[str] = None) -> List[Dict[str, Any]]:
         """Get top performing players with recent statistical averages."""
+
+        # Type conversion: handle string numbers from AI agents
+        num_games = int(num_games) if isinstance(num_games, str) else num_games
+        
         _, team_id = self._resolve_team(team_name)
         
         def fetch():
@@ -256,6 +264,10 @@ class DataTool:
     
     def get_historical_performance(self, num_seasons: int = 3, team_name: Optional[str] = None) -> List[Dict[str, Any]]:
         """Get historical performance across multiple seasons."""
+        
+        # Type conversion: handle string numbers from AI agents
+        num_seasons = int(num_seasons) if isinstance(num_seasons, str) else num_seasons
+        
         _, team_id = self._resolve_team(team_name)
         
         def fetch():
@@ -286,7 +298,6 @@ class DataTool:
         prev_avg = statistics.mean(g['team_points'] for g in prev)
         recent_avg = statistics.mean(g['team_points'] for g in recent)
         
-        
         return {
             "trend": "improving" if recent_wins > prev_wins else "declining",
             "recent_win_rate": recent_wins / 10,
@@ -301,6 +312,10 @@ class DataTool:
     
     def get_performance_metrics(self, num_games: int = 20, team_name: Optional[str] = None) -> PerformanceMetrics:
         """Calculate comprehensive performance metrics."""
+        
+        # Type conversion: handle string numbers from AI agents
+        num_games = int(num_games) if isinstance(num_games, str) else num_games
+        
         games = self.get_recent_games(num_games, team_name)
         if not games:
             return PerformanceMetrics(0, 0, 0, 0, 0, 0, "unknown")
