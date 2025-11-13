@@ -1,0 +1,63 @@
+{
+  "list_available_metrics": {
+    "tool": "forecast_tool",
+    "description": "List all available metrics organized by category (social_engagement, performance, financial, attendance). Use this first to discover what metrics are available for forecasting.",
+    "parameters": {},
+    "returns": "Dictionary with categories and their available metrics"
+  },
+  "get_metric_info": {
+    "tool": "forecast_tool",
+    "description": "Get detailed statistics about a specific metric including mean, median, standard deviation, min, max, and sample size. Use this to understand a metric before forecasting it.",
+    "parameters": {
+      "dataset_name": "string - Dataset identifier (e.g., 'nba_elo', 'twitter_nba')",
+      "metric_name": "string - Metric column name"
+    },
+    "returns": "Dictionary with metric statistics and metadata"
+  },
+  "auto_forecast": {
+    "tool": "forecast_tool",
+    "description": "Automatically forecast a metric by intelligently selecting the best predictive features using machine learning. This is the easiest way to generate predictions - the tool handles feature selection automatically.",
+    "parameters": {
+      "dataset_name": "string - Dataset identifier",
+      "target_metric": "string - Metric to predict",
+      "current_context": "dict (optional) - Current values for prediction features"
+    },
+    "returns": "StatisticalForecast object with predicted_value, confidence_score, trend_direction, percent_change, prediction intervals, and model accuracy"
+  },
+  "forecast_metric": {
+    "tool": "forecast_tool",
+    "description": "Forecast a specific metric using manually provided feature columns. Use this when you want precise control over which features to use for prediction.",
+    "parameters": {
+      "dataset_name": "string - Dataset identifier",
+      "target_metric": "string - Metric to predict",
+      "feature_columns": "list - List of feature column names to use",
+      "current_values": "dict (optional) - Current feature values for prediction"
+    },
+    "returns": "StatisticalForecast with detailed predictions, confidence metrics, and trend analysis"
+  },
+  "analyze_trend": {
+    "tool": "forecast_tool",
+    "description": "Perform comprehensive time-series trend analysis on a metric. Provides moving averages, trend coefficients, acceleration, seasonality detection, and anomaly scores.",
+    "parameters": {
+      "dataset_name": "string - Dataset identifier",
+      "metric": "string - Metric column name",
+      "window_size": "int (optional, default=5) - Moving average window size"
+    },
+    "returns": "TrendAnalysis with historical_values, moving_average, trend_coefficient, acceleration, seasonality_detected, and anomaly_score"
+  },
+  "calculate_correlations": {
+    "tool": "forecast_tool",
+    "description": "Calculate correlation matrix and identify statistically significant relationships between multiple variables. Useful for understanding which metrics influence each other.",
+    "parameters": {
+      "dataset_name": "string - Dataset identifier",
+      "variables": "list - List of variable names to analyze"
+    },
+    "returns": "List of CorrelationInsight objects with correlation_strength, statistical_significance, and relationship_type"
+  },
+  "get_dataset_summary": {
+    "tool": "forecast_tool",
+    "description": "Get a comprehensive statistical summary of all loaded datasets including row counts, column types, and missing data percentages.",
+    "parameters": {},
+    "returns": "Dictionary with dataset information (rows, columns, numeric_columns, categorical_columns, missing_data_pct)"
+  }
+}

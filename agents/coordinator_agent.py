@@ -54,7 +54,7 @@ class CoordinatorAgent:
     
     def _load_tools(self) -> List[Dict[str, Any]]:
         """Load tool definitions from JSON file"""
-        tools_file = Path(__file__).parent / "../data/agent_descriptions.json"
+        tools_file = Path(__file__).parent / "../data/descriptions/agent_descriptions.json"
         with open(tools_file, 'r') as f:
             config = json.load(f)
         return config["tools"]

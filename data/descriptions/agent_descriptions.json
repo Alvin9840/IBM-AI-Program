@@ -1,0 +1,76 @@
+{
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "analyze_sentiment",
+        "description": "Analyze HISTORICAL fan sentiment patterns from past NBA Twitter data. Identifies what fans said in similar past situations to understand likely sentiment patterns. Can accept current context (game results, performance data) to find relevant historical patterns. Returns sentiment breakdowns, trending topics, platform insights, and engagement patterns from historical data. Note: This analyzes past tweets, not real-time sentiment.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "focus": {
+              "type": "string",
+              "description": "Specific focus area for historical sentiment analysis (e.g., 'recent_game', 'player_performance', 'team_overall', 'platform_breakdown', 'trending_topics')"
+            },
+            "timeframe": {
+              "type": "string",
+              "description": "Context period (e.g., 'recent', 'last_week', 'current_season') - used to contextualize historical pattern matching"
+            },
+            "context": {
+              "type": "object",
+              "description": "Optional current situation details to find similar historical patterns (e.g., {'game_result': 'W', 'score': '115-102', 'win_streak': 3}). Helps match historical sentiment to current context."
+            },
+            "depth": {
+              "type": "string",
+              "description": "Analysis depth: 'overview', 'detailed', or 'comprehensive'"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "generate_content",
+        "description": "Generate creative marketing content including social media posts, content hooks based on recent performances, and event suggestions. Use this when you need to create engaging fan content, plan marketing campaigns, or suggest fan engagement events. Can incorporate sentiment insights and performance context for tailored content.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "content_type": {
+              "type": "string",
+              "description": "Type of content to generate: 'hooks_and_events' (social media hooks and event ideas), 'social_post' (individual posts), 'campaign' (email campaigns)"
+            },
+            "context": {
+              "type": "string",
+              "description": "Context for content generation (e.g., 'recent_performance', 'upcoming_games', 'player_milestone'). Can also accept object with performance/sentiment data for more tailored content."
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "forecast_trends",
+        "description": "Analyze team performance data, statistics, and forecast future trends using CURRENT real-time NBA data. Use this for: (1) CURRENT STATS: Recent game results, player performance, team standings, win/loss records, shooting percentages, momentum scores. (2) PREDICTIONS: Future game wins/performance, fan engagement forecasts, trend analysis, competitive positioning. (3) ANALYSIS: Historical comparisons, performance trends, statistical correlations. This is your go-to tool for any data-driven or predictive question. Use FIRST when questions mention current/recent/last game.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "question": {
+              "type": "string",
+              "description": "The specific question to answer (e.g., 'How many games will Lakers win in next 10?', 'What are the Lakers current stats?', 'How is the team performing lately?', 'What happened in the last Lakers game?')"
+            },
+            "timeframe": {
+              "type": "string",
+              "description": "Time horizon: 'recent' (last few games), 'current_season' (season stats), 'next_10_games' (predictions), 'next_month' (forecasts)"
+            },
+            "scope": {
+              "type": "string",
+              "description": "Focus area: 'stats' (current statistics), 'wins' (game wins/performance), 'engagement' (fan metrics), 'comprehensive' (full analysis), 'performance' (team metrics)"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

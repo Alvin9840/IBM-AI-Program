@@ -1,0 +1,62 @@
+{
+  "get_overall_sentiment": {
+    "tool": "sentiment_tool",
+    "description": "Calculate overall sentiment distribution across all fan tweets. Provides percentage breakdown of positive, negative, and neutral sentiment along with average polarity score. Essential starting point for understanding general fan mood.",
+    "parameters": {
+      "dataset_name": "string (optional) - Specific dataset to analyze (e.g., 'nba_2016_2017_100')",
+      "timeframe": "string (optional) - Time period context (informational only)"
+    },
+    "returns": "SentimentDistribution with positive/negative/neutral percentages, total_posts, and avg_polarity"
+  },
+  "get_platform_breakdown": {
+    "tool": "sentiment_tool",
+    "description": "Analyze fan engagement and sentiment by platform/team partition. Shows which platforms or team communities have the most activity and their sentiment patterns. Useful for understanding where fans are most active and their attitudes.",
+    "parameters": {
+      "dataset_name": "string (optional) - Specific dataset to analyze"
+    },
+    "returns": "List of PlatformEngagement objects with platform, total_posts, avg_followers, avg_retweets, and sentiment_breakdown"
+  },
+  "get_top_entities": {
+    "tool": "sentiment_tool",
+    "description": "Get top mentioned entities (teams, players, locations) with their sentiment scores and engagement metrics. Identifies what fans are talking about most and how they feel about it. Use entity_type to specify what to analyze.",
+    "parameters": {
+      "entity_type": "string - Type of entity: 'teams' (team mentions), 'players' (player accounts), 'locations' (geographic mentions)",
+      "limit": "int (optional, default=10) - Number of top entities to return",
+      "dataset_name": "string (optional) - Specific dataset to analyze"
+    },
+    "returns": "List of TopicAnalysis objects with topic, mention_count, avg_sentiment, engagement_rate, and trending_score"
+  },
+  "analyze_player_sentiment": {
+    "tool": "sentiment_tool",
+    "description": "Analyze fan sentiment toward specific players or all players. Provides detailed sentiment breakdown, mention counts, and associated keywords for each player. Essential for understanding player popularity and fan perception.",
+    "parameters": {
+      "player_name": "string (optional) - Specific player to analyze (partial name match works). If None, returns all players",
+      "dataset_name": "string (optional) - Specific dataset to analyze"
+    },
+    "returns": "List of PlayerSentiment objects with player_name, mention_count, avg_polarity, sentiment_category, and top_keywords"
+  },
+  "get_sentiment_trends": {
+    "tool": "sentiment_tool",
+    "description": "Analyze overall sentiment trends, patterns, and engagement correlations. Provides sentiment volatility, most active users, and correlation between engagement and sentiment. Useful for understanding broader patterns in fan behavior.",
+    "parameters": {
+      "dataset_name": "string (optional) - Specific dataset to analyze"
+    },
+    "returns": "Dictionary with sentiment_volatility, engagement_sentiment_correlation, total_unique_users, avg_post_length, most_active_users, and dataset_coverage"
+  },
+  "search_by_keyword": {
+    "tool": "sentiment_tool",
+    "description": "Search tweets by specific keyword and analyze their sentiment. Find all tweets mentioning a particular topic, player name, game, or event, along with sentiment analysis of those tweets. Useful for targeted analysis of specific topics.",
+    "parameters": {
+      "keyword": "string - Keyword to search for (case-insensitive)",
+      "dataset_name": "string (optional) - Specific dataset to search",
+      "limit": "int (optional, default=50) - Maximum number of results"
+    },
+    "returns": "Dictionary with keyword, matches_found, avg_sentiment, sentiment_breakdown, and sample_tweets"
+  },
+  "get_dataset_summary": {
+    "tool": "sentiment_tool",
+    "description": "Get summary statistics and metadata for all loaded sentiment datasets. Shows what data is available, how many records, what columns exist, and coverage information.",
+    "parameters": {},
+    "returns": "Dictionary with dataset names as keys, each containing records, columns, date_range, has_sentiment, has_engagement, and unique_users"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "get_recent_games": {
+    "tool": "data_tool",
+    "description": "Get recent game results with detailed statistics including scores, shooting percentages, rebounds, assists, and turnovers. Essential for understanding current performance. Supports any NBA team.",
+    "parameters": {
+      "num_games": "int (optional, default=10) - Number of recent games to retrieve",
+      "team_name": "str (optional) - Full team name (e.g., 'Boston Celtics', 'Golden State Warriors'). If omitted, uses default team (Lakers)"
+    },
+    "returns": "List of game dictionaries with game_id, date, matchup, result, team_points, opponent_points, plus_minus, field_goal_pct, three_point_pct, rebounds, assists, turnovers"
+  },
+  "get_team_win_streak": {
+    "tool": "data_tool",
+    "description": "Get the current win or loss streak and recent 10-game record. Useful for understanding current momentum. Supports any NBA team.",
+    "parameters": {
+      "team_name": "str (optional) - Full team name (e.g., 'Miami Heat'). If omitted, uses default team (Lakers)"
+    },
+    "returns": "Dictionary with streak_type (winning/losing), streak_length, and recent_record (wins and losses in last 10 games)"
+  },
+  "get_standings": {
+    "tool": "data_tool",
+    "description": "Get current team standings including conference rank, league rank, win-loss record, and playoff positioning. Supports any NBA team.",
+    "parameters": {
+      "team_name": "str (optional) - Full team name (e.g., 'Denver Nuggets'). If omitted, uses default team (Lakers)"
+    },
+    "returns": "Dictionary with conference, league_rank, wins, losses, win_pct, games_back, last_10, streak"
+  },
+  "get_top_performers": {
+    "tool": "data_tool",
+    "description": "Get top performing players with their recent statistical averages. Use this to identify key contributors. Supports any NBA team.",
+    "parameters": {
+      "num_games": "int (optional, default=5) - Number of games to average statistics over",
+      "team_name": "str (optional) - Full team name (e.g., 'Milwaukee Bucks'). If omitted, uses default team (Lakers)"
+    },
+    "returns": "List of player dictionaries with player_name, position, avg_points, avg_assists, avg_rebounds"
+  },
+  "get_season_stats": {
+    "tool": "data_tool",
+    "description": "Get overall current season statistics including total wins, losses, win percentage, and conference rank. Supports any NBA team.",
+    "parameters": {
+      "team_name": "str (optional) - Full team name (e.g., 'Phoenix Suns'). If omitted, uses default team (Lakers)"
+    },
+    "returns": "Dictionary with season, wins, losses, win_pct, conf_rank"
+  },
+  "get_historical_performance": {
+    "tool": "data_tool",
+    "description": "Get historical performance data across multiple seasons. Essential for identifying long-term trends and patterns. Supports any NBA team.",
+    "parameters": {
+      "num_seasons": "int (optional, default=3) - Number of past seasons to retrieve",
+      "team_name": "str (optional) - Full team name (e.g., 'San Antonio Spurs'). If omitted, uses default team (Lakers)"
+    },
+    "returns": "List of season dictionaries with season, wins, losses, win_pct, made_playoffs"
+  },
+  "analyze_performance_trends": {
+    "tool": "data_tool",
+    "description": "Analyze performance trends by comparing the most recent 10 games to the previous 10 games. Shows whether team is improving or declining. Supports any NBA team.",
+    "parameters": {
+      "team_name": "str (optional) - Full team name (e.g., 'Dallas Mavericks'). If omitted, uses default team (Lakers)"
+    },
+    "returns": "Dictionary with trend (improving/declining), recent_win_rate, previous_win_rate, scoring_trend (recent_avg, previous_avg, change), momentum (positive/negative)"
+  },
+  "get_performance_metrics": {
+    "tool": "data_tool",
+    "description": "Calculate comprehensive performance metrics including win rate, scoring averages, margins, shooting percentages, and consistency ratings. Supports any NBA team.",
+    "parameters": {
+      "num_games": "int (optional, default=20) - Number of games to analyze",
+      "team_name": "str (optional) - Full team name (e.g., 'Brooklyn Nets'). If omitted, uses default team (Lakers)"
+    },
+    "returns": "PerformanceMetrics dataclass with win_rate, wins, losses, avg_points, avg_margin, avg_fg_pct, consistency"
+  },
+  "get_competitive_context": {
+    "tool": "data_tool",
+    "description": "Get competitive positioning and tier classification (championship contender, play-in team, or rebuild mode) based on league rank. Supports any NBA team.",
+    "parameters": {
+      "team_name": "str (optional) - Full team name (e.g., 'Toronto Raptors'). If omitted, uses default team (Lakers)"
+    },
+    "returns": "CompetitiveContext dataclass with league_rank, competitive_tier, playoff_status, win_pct, games_back"
+  },
+  "calculate_momentum_score": {
+    "tool": "data_tool",
+    "description": "Calculate a comprehensive momentum score (0-100) based on recent performance, win streaks, and trends. Higher scores indicate positive momentum. Supports any NBA team.",
+    "parameters": {
+      "team_name": "str (optional) - Full team name (e.g., 'Chicago Bulls'). If omitted, uses default team (Lakers)"
+    },
+    "returns": "Dictionary with score (0-100), sentiment (excellent/positive/neutral/concerning), trend (improving/declining/stable)"
+  }
+}
