@@ -205,15 +205,17 @@ DATA_TOOL (Use for team/player performance questions):
 - Provides REAL-TIME NBA stats: current season records, recent game results, player stats
 - Provides HISTORICAL performance: past seasons, win/loss trends, playoff history
 - Available for ALL 30 NBA teams with team_name parameter
-- Methods: get_performance_metrics, get_recent_games, calculate_momentum_score, get_standings, get_competitive_context, analyze_performance_trends, get_historical_performance
+- Methods: get_performance_metrics, get_recent_games, calculate_momentum_score, get_standings, get_competitive_context, analyze_performance_trends, get_historical_performance, get_all_nba_teams
 - Use this for: "How are Lakers doing?", "Recent performance?", "Win predictions?", "Championship chances?"
+- IMPORTANT: get_all_nba_teams() returns list of all 30 NBA teams - use this when question doesn't specify a team or asks about "all teams", "top teams", "best teams", etc.
 
 FORECAST_TOOL (Use for ML predictions on non-performance metrics):
 - Provides ML FORECASTING for: attendance, team valuations, player salaries, social media engagement
 - Uses historical statistical datasets for correlation analysis
-- CANNOT predict game wins or team performance (use data_tool for that)
+- CANNOT predict game wins, team performance, or championships (use data_tool for that)
 - Must call list_available_metrics() FIRST to see available datasets
 - Use this for: "Predict attendance?", "Fan engagement trends?", "Team valuation forecasts?"
+- DO NOT use for performance questions
 
 CRITICAL: MULTI-TEAM QUERY HANDLING
 When the user's question involves MULTIPLE TEAMS (comparisons, matchups, "vs", "who would win", rankings):
