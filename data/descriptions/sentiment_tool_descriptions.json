@@ -1,4 +1,10 @@
 {
+  "list_datasets": {
+    "tool": "sentiment_tool",
+    "description": "List names of all currently loaded datasets. Use this to see what datasets are available for analysis.",
+    "parameters": {},
+    "returns": "Dictionary with key 'datasets' containing a list of dataset names"
+  },
   "get_overall_sentiment": {
     "tool": "sentiment_tool",
     "description": "Calculate overall sentiment distribution across all fan tweets. Provides percentage breakdown of positive, negative, and neutral sentiment along with average polarity score. Essential starting point for understanding general fan mood.",

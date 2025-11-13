@@ -90,6 +90,10 @@ class SentimentTool:
         if not self.datasets:
             raise ValueError("No valid datasets loaded")
     
+    def list_datasets(self) -> Dict[str, Any]:
+        """List all loaded dataset names."""
+        return { "datasets": list(self.datasets.keys()) }
+    
     def _get_cached(self, key: str) -> Optional[Any]:
         """Retrieve cached result if valid."""
         if key not in self._cache:
@@ -335,14 +339,24 @@ class SentimentTool:
                 for user, count in user_counts.items()]
     
     def search_by_keyword(self, keyword: str, 
-                         dataset_name: Optional[str] = None,
-                         limit: int = 50) -> Dict[str, Any]:
+                     dataset_name: Optional[str] = None,
+                     limit: int = 50) -> Dict[str, Any]:
         """Search tweets by keyword and analyze sentiment."""
+        # Validate keyword parameter - handle case where AI passes a list
+        if isinstance(keyword, list):
+            if not keyword:
+                return {"error": "Empty keyword list provided"}
+            keyword = keyword[0]  # Use first keyword if list provided
+            print(f"⚠️ Warning: keyword was a list, using first element: '{keyword}'")
+        
+        if not isinstance(keyword, str):
+            return {"error": f"keyword must be a string, got {type(keyword)}"}
+        
         df = self._get_dataframe(dataset_name)
         
         if 'text' not in df.columns:
             return {"error": "Text column not found in dataset"}
-        
+            
         results = df[df['text'].str.contains(keyword, case=False, na=False)].head(limit)
         
         if results.empty:

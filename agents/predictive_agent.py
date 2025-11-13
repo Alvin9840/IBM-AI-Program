@@ -1,6 +1,6 @@
 """
-Predictive Agent - Dynamic Trend Forecasting Specialist
-Uses IBM watsonx.ai to intelligently determine which tools and methods to use
+Predictive Agent - Solution 1: Enhanced Prompt Engineering
+Uses improved prompts to handle multi-team queries intelligently
 """
 
 import json
@@ -25,11 +25,11 @@ from config import (
 
 class PredictiveAgent:
     """
-    Intelligent predictive agent that uses watsonx.ai to dynamically determine
-    which tool methods to call based on the prediction request.
+    Intelligent predictive agent with enhanced multi-team query handling.
+    Uses improved prompt engineering to recognize and handle multiple teams.
     """
     
-    MAX_ITERATIONS = 5
+    MAX_ITERATIONS = 6  # Increased for multi-team queries
     TOOL_RESULT_PREVIEW_LENGTH = 500
     DATA_PREVIEW_LENGTH = 2000
     
@@ -50,7 +50,7 @@ class PredictiveAgent:
         self.tool_catalog = self._load_tool_catalog()
         self.conversation_history = []
         
-        print("✅ Predictive Agent initialized with dynamic tool selection")
+        print("✅ Predictive Agent initialized with enhanced multi-team support")
     
     def _load_tool_catalog(self) -> Dict[str, Dict[str, Any]]:
         """Load tool method definitions from JSON files"""
@@ -184,7 +184,7 @@ class PredictiveAgent:
         return tool_results
     
     def _build_decision_prompt(self) -> str:
-        """Build prompt for AI to decide next action"""
+        """Build enhanced prompt for AI to decide next action with multi-team support"""
         tools_text = self._format_tool_catalog()
         conversation_text = self._format_conversation_history()
         
@@ -192,12 +192,38 @@ class PredictiveAgent:
 
 Your job is to analyze requests about future trends, predictions, and forecasts, then determine which tool methods to call to gather the necessary data.
 
+CRITICAL: MULTI-TEAM QUERY HANDLING
+When the user's question involves MULTIPLE TEAMS (comparisons, matchups, "vs", "who would win", rankings):
+1. IDENTIFY ALL TEAM NAMES mentioned in the question
+2. Call the SAME data_tool methods for EACH team SEPARATELY using the team_name parameter
+3. You MUST gather data for ALL teams before providing analysis
+
+EXAMPLES OF MULTI-TEAM QUERIES:
+- "Who would win: Orlando Magic vs Boston Celtics?"
+  → Call get_performance_metrics(team_name="Orlando Magic")
+  → Call get_performance_metrics(team_name="Boston Celtics")
+  → Call calculate_momentum_score(team_name="Orlando Magic")
+  → Call calculate_momentum_score(team_name="Boston Celtics")
+  → Then compare and provide prediction
+
+- "Compare Lakers, Warriors, and Celtics performance"
+  → Call methods for ALL THREE teams
+
+- "How do the Magic and Celtics match up?"
+  → Call methods for BOTH teams
+
+SINGLE-TEAM vs MULTI-TEAM DETECTION:
+- Single team: "How are the Lakers doing?" → Use team_name="Los Angeles Lakers"
+- Two teams: "Magic vs Celtics" → Use team_name for EACH team
+- Multiple teams: "Compare top 5 teams" → Use team_name for ALL teams
+- Default team: If no team mentioned, use team_name parameter without value (defaults to Lakers)
+
 IMPORTANT CONTEXT:
-- For questions about GAME WINS, TEAM PERFORMANCE, or WIN PREDICTIONS: Use data_tool methods to get current performance, trends, and momentum
-- For questions about SOCIAL METRICS or FAN ENGAGEMENT PREDICTIONS: Use forecast_tool with available datasets
-- ALWAYS call list_available_metrics FIRST if you need to use forecast_tool datasets to see what's actually available
-- data_tool provides real-time Lakers performance data (recent games, win streaks, standings, momentum)
-- forecast_tool provides historical statistical datasets for correlation and forecasting
+- For questions about GAME WINS, TEAM PERFORMANCE, or WIN PREDICTIONS: Use data_tool methods
+- For questions about SOCIAL METRICS or FAN ENGAGEMENT: Use forecast_tool
+- ALWAYS call list_available_metrics FIRST if you need to use forecast_tool datasets
+- data_tool provides real-time performance data for ANY NBA team
+- forecast_tool provides historical statistical datasets for correlation
 
 {tools_text}
 
@@ -205,23 +231,32 @@ IMPORTANT CONTEXT:
 
 INSTRUCTIONS:
 1. If you need to gather more data, respond with a JSON object listing tool calls:
-   {{"tool_calls": [{{"method": "method_name", "parameters": {{"param": "value", "team_name" : "value"}}}}]}}
+   {{"tool_calls": [{{"method": "method_name", "parameters": {{"param": "value", "team_name": "Full Team Name"}}}}]}}
 
-2. You can call multiple tools in one response if needed.
+2. For MULTI-TEAM queries, make MULTIPLE tool calls in ONE response (you can call the same method multiple times with different team_name values)
 
-3. If you have gathered sufficient data to answer the question, provide a comprehensive natural language analysis.
+3. If you have gathered sufficient data to answer the question, provide a comprehensive natural language analysis
 
-4. For GAME WIN PREDICTIONS specifically:
-   - Use data_tool methods: get_recent_games, get_performance_metrics, analyze_performance_trends, calculate_momentum_score
-   - Analyze win rate, trends, momentum, and recent performance
-   - Make predictions based on current form and historical patterns
+4. For MATCHUP PREDICTIONS specifically:
+   - Get performance metrics for BOTH teams
+   - Get momentum scores for BOTH teams
+   - Get recent trends for BOTH teams
+   - Compare win rates, momentum, recent form, scoring efficiency
+   - Predict winner based on data with confidence percentage
 
-5. When analyzing data, consider:
+5. TEAM NAME FORMAT: Always use full official team names:
+   - "Los Angeles Lakers" (not "Lakers")
+   - "Boston Celtics" (not "Celtics")
+   - "Orlando Magic" (not "Magic")
+   - "Golden State Warriors" (not "Warriors")
+   - "Miami Heat" (not "Heat")
+
+6. When analyzing data, consider:
    - Current performance trends
    - Historical patterns
    - Statistical predictions
-   - Correlation insights
    - Momentum indicators
+   - Win/loss records
 
 Your response:"""
     
@@ -306,11 +341,19 @@ ORIGINAL QUESTION: {question}
 DATA GATHERED:
 {data_preview}
 
+IMPORTANT: If this is a MULTI-TEAM comparison or matchup prediction:
+1. Compare the metrics across ALL teams
+2. Identify which team has advantages in each area
+3. Provide a clear prediction with confidence percentage
+4. Explain the reasoning based on the data
+
 Provide a natural language analysis that:
-1. Answers the original question
+1. Answers the original question directly
 2. Highlights key predictions and trends
-3. Provides actionable insights
-4. Includes relevant metrics and forecasts with numbers.
+3. Provides specific numbers and metrics
+4. For matchups: states predicted winner with confidence %
+5. Explains reasoning clearly
+6. Use numbers for relevant metrics and insights
 
 Your analysis:"""
         
