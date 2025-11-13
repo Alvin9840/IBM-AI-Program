@@ -4,7 +4,7 @@ Uses IBM watsonx.ai to intelligently analyze historical Twitter sentiment patter
 """
 
 import json
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from pathlib import Path
 from dataclasses import is_dataclass, asdict
 
@@ -67,6 +67,11 @@ class SentimentAgent:
         
         with open(catalog_path, 'r') as f:
             return json.load(f)
+    
+    def _get_available_datasets(self) -> str:
+        """Get list of available datasets for the prompt."""
+        datasets = list(self.sentiment_tool.datasets.keys())
+        return ", ".join(datasets) if datasets else "No datasets loaded"
     
     def _make_serializable(self, obj: Any) -> Any:
         """Convert dataclasses and other non-serializable objects to dictionaries."""
@@ -199,15 +204,35 @@ class SentimentAgent:
 
 CRITICAL: You analyze HISTORICAL sentiment data from past NBA Twitter posts, NOT real-time data.
 
+AVAILABLE DATASETS:
+{self._get_available_datasets()}
+
+⚠️ CRITICAL DATASET RULES:
+- Only use dataset names from the AVAILABLE DATASETS list above
+- If unsure about dataset name, OMIT the dataset_name parameter (searches all datasets)
+- NEVER invent dataset names like "hypothetical_game_outcome" or "recent_game_sentiment"
+- Most queries work best WITHOUT specifying dataset_name
+
 AVAILABLE TOOLS:
 {tools_desc}
 
+⚠️ CRITICAL PARAMETER RULES:
+- keyword parameter in search_by_keyword MUST be a STRING, not a list
+  ✅ Correct: {{"method": "search_by_keyword", "parameters": {{"keyword": "loss"}}}}
+  ❌ Wrong: {{"method": "search_by_keyword", "parameters": {{"keyword": ["L", "loss"]}}}}
+- entity_type must be one of: "teams", "players", "locations" (string, not list)
+- limit must be an integer
+- All string parameters must be strings, not lists
+
 WORKFLOW GUIDE:
-1. For context-based questions: Use search_by_keyword to find similar historical situations
-2. For overall patterns: Use get_overall_sentiment + get_sentiment_trends
-3. For player focus: Use analyze_player_sentiment
-4. For trending analysis: Use get_top_entities
-5. For platform insights: Use get_platform_breakdown
+1. For context-based questions: Use search_by_keyword WITHOUT dataset_name parameter
+2. For overall patterns: Use get_overall_sentiment WITHOUT dataset_name parameter
+3. For player focus: Use analyze_player_sentiment WITHOUT dataset_name parameter
+4. For trending analysis: Use get_top_entities WITHOUT dataset_name parameter
+5. For platform insights: Use get_platform_breakdown WITHOUT dataset_name parameter
+
+IMPORTANT: Most queries should NOT specify dataset_name - omit it to search all available data.
+Only specify dataset_name if you know the exact dataset name from the AVAILABLE DATASETS list above.
 
 CONVERSATION HISTORY:
 {history_preview}
@@ -275,7 +300,8 @@ Provide structured analysis:
 6. INSIGHTS - Notable patterns and what they suggest
 
 Use past tense: "Historically...", "Past fans said...", "Historical data shows..."
-Include specific numbers and percentages.
+
+Make sure to include specific numbers and percentages for relevant metrics.
 
 Your analysis:"""
         

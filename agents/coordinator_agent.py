@@ -167,11 +167,12 @@ class CoordinatorAgent:
         {conversation_text}
 
         Instructions:
-        If you need to call a tool, respond with a JSON object in this format:
+        If you need to call a tool, respond with a JSON object in this format. Make sure the format is EXACTLY the same:
         {{"tool_calls": [{{"name": "tool_name", "parameters": {{"param": "value"}}}}]}}
 
         If you have all the information needed to answer, provide a natural language response without any JSON.
         Be concise but comprehensive in your final answer.
+        Do not give JSON outputs, rather the final analysis
 
         Your response:"""
             
@@ -184,10 +185,24 @@ class CoordinatorAgent:
                 if start != -1 and end != 0:
                     parsed = json.loads(response[start:end])
                     if "tool_calls" in parsed:
-                        return parsed["tool_calls"]
+                        tool_calls = parsed["tool_calls"]
+                        
+                        # Validate each tool call has required fields
+                        valid_calls = []
+                        for call in tool_calls:
+                            if isinstance(call, dict) and "name" in call:
+                                # Add empty parameters if missing
+                                if "parameters" not in call:
+                                    call["parameters"] = {}
+                                valid_calls.append(call)
+                            else:
+                                print(f"⚠️ Skipping malformed tool call: {call}")
+                        
+                        return valid_calls
             return []
         except (json.JSONDecodeError, Exception) as e:
             print(f"⚠️ Error parsing tool calls: {e}")
+            print(f"Response was: {response[:300]}...")
             return []
     
     def _execute_tool(self, tool_name: str, parameters: Dict[str, Any]) -> Dict[str, Any]:
