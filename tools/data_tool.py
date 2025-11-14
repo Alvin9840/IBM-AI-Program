@@ -77,7 +77,15 @@ class DataTool:
         return data
     
     def get_recent_games(self, num_games: int = 10, team_name: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Get recent game results with detailed statistics."""
+        """Get recent game results with detailed statistics.
+        
+        Args:
+            num_games: Number of recent games to retrieve (will convert string to int if needed)
+            team_name: Team name (uses default if None)
+        """
+        # Type conversion: handle string numbers from AI agents
+        num_games = int(num_games) if isinstance(num_games, str) else num_games
+        
         _, team_id = self._resolve_team(team_name)
         
         def fetch():
@@ -174,7 +182,15 @@ class DataTool:
         return self._fetch_cached(f"roster_{team_id}", fetch, self.TTL_SESSION)
     
     def get_top_performers(self, num_games: int = 5, team_name: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Get top performing players with recent statistical averages."""
+        """Get top performing players with recent statistical averages.
+        
+        Args:
+            num_games: Number of recent games to analyze (will convert string to int if needed)
+            team_name: Team name (uses default if None)
+        """
+        # Type conversion: handle string numbers from AI agents
+        num_games = int(num_games) if isinstance(num_games, str) else num_games
+        
         _, team_id = self._resolve_team(team_name)
         
         def fetch():
@@ -255,7 +271,15 @@ class DataTool:
         return self._fetch_cached(f"season_{team_id}", fetch, 86400)
     
     def get_historical_performance(self, num_seasons: int = 3, team_name: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Get historical performance across multiple seasons."""
+        """Get historical performance across multiple seasons.
+        
+        Args:
+            num_seasons: Number of seasons to retrieve (will convert string to int if needed)
+            team_name: Team name (uses default if None)
+        """
+        # Type conversion: handle string numbers from AI agents
+        num_seasons = int(num_seasons) if isinstance(num_seasons, str) else num_seasons
+        
         _, team_id = self._resolve_team(team_name)
         
         def fetch():
@@ -286,7 +310,6 @@ class DataTool:
         prev_avg = statistics.mean(g['team_points'] for g in prev)
         recent_avg = statistics.mean(g['team_points'] for g in recent)
         
-        
         return {
             "trend": "improving" if recent_wins > prev_wins else "declining",
             "recent_win_rate": recent_wins / 10,
@@ -300,7 +323,15 @@ class DataTool:
         }
     
     def get_performance_metrics(self, num_games: int = 20, team_name: Optional[str] = None) -> PerformanceMetrics:
-        """Calculate comprehensive performance metrics."""
+        """Calculate comprehensive performance metrics.
+        
+        Args:
+            num_games: Number of games to analyze (will convert string to int if needed)
+            team_name: Team name (uses default if None)
+        """
+        # Type conversion: handle string numbers from AI agents
+        num_games = int(num_games) if isinstance(num_games, str) else num_games
+        
         games = self.get_recent_games(num_games, team_name)
         if not games:
             return PerformanceMetrics(0, 0, 0, 0, 0, 0, "unknown")
@@ -402,6 +433,23 @@ class DataTool:
         """Get cache statistics."""
         valid = sum(1 for _, (_, exp) in self._cache.items() if datetime.now() < exp)
         return {"total_cached": len(self._cache), "valid_entries": valid}
+    
+    def get_all_nba_teams(self) -> List[Dict[str, Any]]:
+        """Get list of all NBA teams with their full names and abbreviations.
+        
+        Returns:
+            List of dictionaries containing team information (id, full_name, abbreviation, city, nickname)
+        """
+        return [
+            {
+                "id": team['id'],
+                "full_name": team['full_name'],
+                "abbreviation": team['abbreviation'],
+                "city": team['city'],
+                "nickname": team['nickname']
+            }
+            for team in teams.get_teams()
+        ]
     
     def clear_cache(self, team_name: Optional[str] = None) -> None:
         """Clear cached data."""

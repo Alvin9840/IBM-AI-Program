@@ -145,9 +145,16 @@ class PredictiveAgent:
                 break
             
             tool_results = self._execute_tools(tool_calls, workflow_result, iteration)
+            # Serialize with default=str to handle numpy/pandas types
+            try:
+                tool_content = json.dumps(tool_results, indent=2, default=str)
+            except (TypeError, ValueError) as e:
+                print(f"⚠️ Serialization warning: {e}")
+                tool_content = str(tool_results)
+
             self.conversation_history.append({
                 "role": "tool",
-                "content": json.dumps(tool_results, indent=2, default=str)
+                "content": tool_content
             })
         
         if not workflow_result["final_analysis"]:
@@ -192,6 +199,24 @@ class PredictiveAgent:
 
 Your job is to analyze requests about future trends, predictions, and forecasts, then determine which tool methods to call to gather the necessary data.
 
+IMPORTANT CONTEXT - TOOL CAPABILITIES:
+
+DATA_TOOL (Use for team/player performance questions):
+- Provides REAL-TIME NBA stats: current season records, recent game results, player stats
+- Provides HISTORICAL performance: past seasons, win/loss trends, playoff history
+- Available for ALL 30 NBA teams with team_name parameter
+- Methods: get_performance_metrics, get_recent_games, calculate_momentum_score, get_standings, get_competitive_context, analyze_performance_trends, get_historical_performance, get_all_nba_teams
+- Use this for: "How are Lakers doing?", "Recent performance?", "Win predictions?", "Championship chances?"
+- IMPORTANT: get_all_nba_teams() returns list of all 30 NBA teams - use this when question doesn't specify a team or asks about "all teams", "top teams", "best teams", etc.
+
+FORECAST_TOOL (Use for ML predictions on non-performance metrics):
+- Provides ML FORECASTING for: attendance, team valuations, player salaries, social media engagement
+- Uses historical statistical datasets for correlation analysis
+- CANNOT predict game wins, team performance, or championships (use data_tool for that)
+- Must call list_available_metrics() FIRST to see available datasets
+- Use this for: "Predict attendance?", "Fan engagement trends?", "Team valuation forecasts?"
+- DO NOT use for performance questions
+
 CRITICAL: MULTI-TEAM QUERY HANDLING
 When the user's question involves MULTIPLE TEAMS (comparisons, matchups, "vs", "who would win", rankings):
 1. IDENTIFY ALL TEAM NAMES mentioned in the question
@@ -218,13 +243,6 @@ SINGLE-TEAM vs MULTI-TEAM DETECTION:
 - Multiple teams: "Compare top 5 teams" → Use team_name for ALL teams
 - Default team: If no team mentioned, use team_name parameter without value (defaults to Lakers)
 
-IMPORTANT CONTEXT:
-- For questions about GAME WINS, TEAM PERFORMANCE, or WIN PREDICTIONS: Use data_tool methods
-- For questions about SOCIAL METRICS or FAN ENGAGEMENT: Use forecast_tool
-- ALWAYS call list_available_metrics FIRST if you need to use forecast_tool datasets
-- data_tool provides real-time performance data for ANY NBA team
-- forecast_tool provides historical statistical datasets for correlation
-
 {tools_text}
 
 {conversation_text}
@@ -235,28 +253,41 @@ INSTRUCTIONS:
 
 2. For MULTI-TEAM queries, make MULTIPLE tool calls in ONE response (you can call the same method multiple times with different team_name values)
 
-3. If you have gathered sufficient data to answer the question, provide a comprehensive natural language analysis
+3. For performance/championship questions, call MULTIPLE data_tool methods to gather comprehensive data:
+   - get_performance_metrics (win rate, scoring efficiency)
+   - calculate_momentum_score (current momentum)
+   - get_standings (playoff positioning)
+   - get_competitive_context (championship contender tier)
+   - analyze_performance_trends (improving or declining)
 
-4. For MATCHUP PREDICTIONS specifically:
+4. If you have gathered sufficient data to answer the question, provide a comprehensive natural language analysis
+
+5. For MATCHUP PREDICTIONS specifically:
    - Get performance metrics for BOTH teams
    - Get momentum scores for BOTH teams
    - Get recent trends for BOTH teams
    - Compare win rates, momentum, recent form, scoring efficiency
    - Predict winner based on data with confidence percentage
 
-5. TEAM NAME FORMAT: Always use full official team names:
+6. TEAM NAME FORMAT: Always use full official team names:
    - "Los Angeles Lakers" (not "Lakers")
    - "Boston Celtics" (not "Celtics")
    - "Orlando Magic" (not "Magic")
    - "Golden State Warriors" (not "Warriors")
    - "Miami Heat" (not "Heat")
 
-6. When analyzing data, consider:
+7. When analyzing data, consider:
    - Current performance trends
    - Historical patterns
    - Statistical predictions
    - Momentum indicators
    - Win/loss records
+   - Competitive tier (championship contender vs play-in vs rebuild)
+
+8. Use specific numbers and metrics in your analysis - don't be vague
+
+⚠️ CRITICAL: For ANY question about team performance, wins, or championships → Use data_tool methods FIRST
+⚠️ NEVER say "we need more data" when data_tool methods exist for the question
 
 Your response:"""
     

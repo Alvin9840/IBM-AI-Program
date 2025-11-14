@@ -1,4 +1,10 @@
 {
+  "get_all_nba_teams": {
+    "tool": "data_tool",
+    "description": "Get a complete list of all 30 NBA teams with their IDs, full names, abbreviations, cities, and nicknames. Use this when the question doesn't specify a team or asks about 'all teams', 'top teams', 'best teams', 'championship favorites', etc. This helps identify which teams to query for detailed analysis.",
+    "parameters": {},
+    "returns": "List of dictionaries with id, full_name, abbreviation, city, nickname for all 30 NBA teams"
+  },
   "get_recent_games": {
     "tool": "data_tool",
     "description": "Get recent game results with detailed statistics including scores, shooting percentages, rebounds, assists, and turnovers. Essential for understanding current performance. Supports any NBA team.",
