@@ -451,6 +451,94 @@ class DataTool:
             for team in teams.get_teams()
         ]
     
+    def get_teams_by_rank(self, start_rank: int = 1, end_rank: int = 5) -> List[Dict[str, Any]]:
+        """Get teams within a specific league rank range with their key performance data.
+        
+        Args:
+            start_rank: Starting league rank (1 = best team)
+            end_rank: Ending league rank (inclusive)
+        
+        Returns:
+            List of team dictionaries sorted by rank, each containing:
+            - rank, team_name, wins, losses, win_pct, conference
+            - performance metrics (win_rate, avg_points, avg_margin)
+            - momentum score and trend
+        """
+        # Convert to int if string was passed
+        start_rank = int(start_rank) if isinstance(start_rank, str) else start_rank
+        end_rank = int(end_rank) if isinstance(end_rank, str) else end_rank
+        
+        # Validate inputs
+        if start_rank < 1:
+            start_rank = 1
+        if end_rank > 30:
+            end_rank = 30
+        if start_rank > end_rank:
+            start_rank, end_rank = end_rank, start_rank
+        
+        def fetch():
+            try:
+                # Get all standings
+                df = leaguestandings.LeagueStandings().get_data_frames()[0]
+                
+                # Sort by league rank and filter
+                df = df.sort_values('LeagueRank')
+                filtered = df[(df['LeagueRank'] >= start_rank) & (df['LeagueRank'] <= end_rank)]
+                
+                teams_data = []
+                for _, row in filtered.iterrows():
+                    team_name = f"{row['TeamCity']} {row['TeamName']}"
+                    
+                    # Get performance metrics for this team
+                    try:
+                        metrics = self.get_performance_metrics(num_games=20, team_name=team_name)
+                        momentum = self.calculate_momentum_score(team_name=team_name)
+                        trends = self.analyze_performance_trends(team_name=team_name)
+                        
+                        teams_data.append({
+                            "rank": int(row['LeagueRank']),
+                            "team_name": team_name,
+                            "wins": int(row['WINS']),
+                            "losses": int(row['LOSSES']),
+                            "win_pct": float(row['WinPCT']),
+                            "conference": row['Conference'],
+                            "games_back": float(row['ConferenceGamesBack']),
+                            "performance": {
+                                "win_rate": metrics.win_rate,
+                                "avg_points": metrics.avg_points,
+                                "avg_margin": metrics.avg_margin,
+                                "avg_fg_pct": metrics.avg_fg_pct,
+                                "consistency": metrics.consistency
+                            },
+                            "momentum": {
+                                "score": momentum['score'],
+                                "sentiment": momentum['sentiment'],
+                                "trend": momentum['trend']
+                            },
+                            "recent_trend": trends.get('trend', 'stable')
+                        })
+                    except Exception as e:
+                        print(f"⚠️ Error getting detailed stats for {team_name}: {e}")
+                        # Add basic info even if detailed stats fail
+                        teams_data.append({
+                            "rank": int(row['LeagueRank']),
+                            "team_name": team_name,
+                            "wins": int(row['WINS']),
+                            "losses": int(row['LOSSES']),
+                            "win_pct": float(row['WinPCT']),
+                            "conference": row['Conference'],
+                            "games_back": float(row['ConferenceGamesBack'])
+                        })
+                
+                return teams_data
+                
+            except Exception as e:
+                print(f"⚠️ Error fetching teams by rank: {e}")
+                return []
+        
+        cache_key = f"teams_rank_{start_rank}_{end_rank}"
+        return self._fetch_cached(cache_key, fetch, self.TTL_FRESH)
+    
     def clear_cache(self, team_name: Optional[str] = None) -> None:
         """Clear cached data."""
         if team_name:

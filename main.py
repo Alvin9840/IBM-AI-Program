@@ -26,7 +26,7 @@ def main():
     # Example interactions
     example_queries = [
         "How are the Lakers performing right now?",
-        "Whos likely to win the next NBA championship?",
+        "Are the Thunder to win the next NBA championship?",
         "How do the Warrior match up against the top teams in the West?",
         "What would fans say if the Orlando Magic won the NBA cup?",
         "Show me historical sentiment patterns for comeback wins",

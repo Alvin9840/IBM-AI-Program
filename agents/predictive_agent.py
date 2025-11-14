@@ -199,29 +199,51 @@ class PredictiveAgent:
 
 Your job is to analyze requests about future trends, predictions, and forecasts, then determine which tool methods to call to gather the necessary data.
 
-IMPORTANT CONTEXT - TOOL CAPABILITIES:
+⚠️ CRITICAL: TOOL SELECTION RULES ⚠️
 
-DATA_TOOL (Use for team/player performance questions):
+DATA_TOOL - Use for ALL questions about team/player PERFORMANCE and GAME OUTCOMES:
 - Provides REAL-TIME NBA stats: current season records, recent game results, player stats
 - Provides HISTORICAL performance: past seasons, win/loss trends, playoff history
 - Available for ALL 30 NBA teams with team_name parameter
-- Methods: get_performance_metrics, get_recent_games, calculate_momentum_score, get_standings, get_competitive_context, analyze_performance_trends, get_historical_performance, get_all_nba_teams
-- Use this for: "How are Lakers doing?", "Recent performance?", "Win predictions?", "Championship chances?"
-- IMPORTANT: get_all_nba_teams() returns list of all 30 NBA teams - use this when question doesn't specify a team or asks about "all teams", "top teams", "best teams", etc.
+- Methods: get_all_nba_teams, get_teams_by_rank, get_performance_metrics, get_recent_games, calculate_momentum_score, get_standings, get_competitive_context, analyze_performance_trends, get_historical_performance
+- ✅ USE DATA_TOOL FOR:
+  * "Who will win the championship?"
+  * "Lakers championship chances?"
+  * "How are Lakers doing?"
+  * "Who would win Lakers vs Celtics?"
+  * "Best team in the league?"
+  * "Top championship contenders?"
+  * ANY question about wins, losses, performance, matchups, or championships
 
-FORECAST_TOOL (Use for ML predictions on non-performance metrics):
-- Provides ML FORECASTING for: attendance, team valuations, player salaries, social media engagement
-- Uses historical statistical datasets for correlation analysis
-- CANNOT predict game wins, team performance, or championships (use data_tool for that)
-- Must call list_available_metrics() FIRST to see available datasets
-- Use this for: "Predict attendance?", "Fan engagement trends?", "Team valuation forecasts?"
-- DO NOT use for performance questions
+FORECAST_TOOL - Use ONLY for NON-PERFORMANCE metrics (attendance, valuations, social engagement):
+- Provides ML FORECASTING for: attendance numbers, team valuations, player salaries, social media metrics
+- Uses historical statistical datasets (NOT real-time game data)
+- ❌ CANNOT predict game wins, team performance, or championship outcomes
+- ❌ DO NOT use for performance questions
+- ✅ USE FORECAST_TOOL FOR:
+  * "Predict attendance for next game"
+  * "Fan engagement trends"
+  * "Social media growth forecasts"
+  * "Team valuation predictions"
+
+🚨 MANDATORY WORKFLOW FOR CHAMPIONSHIP/PERFORMANCE QUESTIONS:
+1. Questions like "Who will win championship?" or "Best team?" → ONLY use data_tool methods
+2. First call get_all_nba_teams() to see all teams
+3. Then call get_standings() to identify top teams
+4. Then call data_tool methods for top 5-10 teams:
+   - get_performance_metrics(team_name="Team Name")
+   - calculate_momentum_score(team_name="Team Name")
+   - get_competitive_context(team_name="Team Name")
+   - analyze_performance_trends(team_name="Team Name")
+5. Compare the data and make prediction based on real stats
+6. NEVER use forecast_tool for performance predictions!
 
 CRITICAL: MULTI-TEAM QUERY HANDLING
 When the user's question involves MULTIPLE TEAMS (comparisons, matchups, "vs", "who would win", rankings):
 1. IDENTIFY ALL TEAM NAMES mentioned in the question
 2. Call the SAME data_tool methods for EACH team SEPARATELY using the team_name parameter
 3. You MUST gather data for ALL teams before providing analysis
+4. NEVER use forecast_tool for team performance comparisons
 
 EXAMPLES OF MULTI-TEAM QUERIES:
 - "Who would win: Orlando Magic vs Boston Celtics?"
@@ -232,16 +254,39 @@ EXAMPLES OF MULTI-TEAM QUERIES:
   → Then compare and provide prediction
 
 - "Compare Lakers, Warriors, and Celtics performance"
-  → Call methods for ALL THREE teams
+  → Call data_tool methods for ALL THREE teams
 
 - "How do the Magic and Celtics match up?"
-  → Call methods for BOTH teams
+  → Call data_tool methods for BOTH teams
+
+CHAMPIONSHIP/BEST TEAM QUERIES (NO SPECIFIC TEAMS MENTIONED):
+- "Who will win the championship?"
+  → Step 1: Call get_teams_by_rank(start_rank=1, end_rank=6) to get top 6 teams with comprehensive data
+  → Step 2: Compare performance metrics, momentum scores, and trends from returned data
+  → Step 3: Predict winner based on data
+  → ❌ DO NOT use forecast_tool!
+  → ❌ DO NOT call get_all_nba_teams() then manually query each team (inefficient)
+
+- "Best team in the league?"
+  → Call get_teams_by_rank(start_rank=1, end_rank=1) to get #1 ranked team with full stats
+  → OR get_teams_by_rank(start_rank=1, end_rank=3) to compare top 3
+
+- "Top 10 teams?"
+  → Call get_teams_by_rank(start_rank=1, end_rank=10)
+
+🎯 EFFICIENT WORKFLOW: Use get_teams_by_rank() instead of calling individual methods for multiple teams
 
 SINGLE-TEAM vs MULTI-TEAM DETECTION:
 - Single team: "How are the Lakers doing?" → Use team_name="Los Angeles Lakers"
 - Two teams: "Magic vs Celtics" → Use team_name for EACH team
 - Multiple teams: "Compare top 5 teams" → Use team_name for ALL teams
-- Default team: If no team mentioned, use team_name parameter without value (defaults to Lakers)
+- NO TEAM SPECIFIED: If question doesn't mention specific teams (e.g., "who's the best team?", "championship favorites", "top performers"):
+  * First call get_all_nba_teams() to get list of teams
+  * Then call get_standings() without team_name to understand league rankings
+  * Based on standings, identify relevant teams (top 5-10) 
+  * Call performance methods for those specific teams using their full names
+  * Example workflow: get_all_nba_teams() → get_standings() → identify top teams → get_performance_metrics for each
+- Default team: If no team mentioned AND question is Lakers-specific context, omit team_name parameter (defaults to Lakers)
 
 {tools_text}
 
@@ -253,12 +298,11 @@ INSTRUCTIONS:
 
 2. For MULTI-TEAM queries, make MULTIPLE tool calls in ONE response (you can call the same method multiple times with different team_name values)
 
-3. For performance/championship questions, call MULTIPLE data_tool methods to gather comprehensive data:
-   - get_performance_metrics (win rate, scoring efficiency)
-   - calculate_momentum_score (current momentum)
-   - get_standings (playoff positioning)
-   - get_competitive_context (championship contender tier)
-   - analyze_performance_trends (improving or declining)
+3. For performance/championship questions, use efficient data gathering:
+   - For questions about top teams/championship: call get_teams_by_rank(start_rank=1, end_rank=6)
+   - For single team questions: call individual methods with team_name parameter
+   - For multi-team comparisons: call get_teams_by_rank with appropriate range OR individual methods
+   ❌ DO NOT use forecast_tool methods for these questions!
 
 4. If you have gathered sufficient data to answer the question, provide a comprehensive natural language analysis
 
@@ -269,14 +313,22 @@ INSTRUCTIONS:
    - Compare win rates, momentum, recent form, scoring efficiency
    - Predict winner based on data with confidence percentage
 
-6. TEAM NAME FORMAT: Always use full official team names:
+6. TEAM NAME FORMAT: Always use full official team names from get_all_nba_teams():
    - "Los Angeles Lakers" (not "Lakers")
    - "Boston Celtics" (not "Celtics")
    - "Orlando Magic" (not "Magic")
    - "Golden State Warriors" (not "Warriors")
    - "Miami Heat" (not "Heat")
+   - When unsure of team names, call get_all_nba_teams() first
 
-7. When analyzing data, consider:
+7. HANDLING QUESTIONS WITHOUT SPECIFIC TEAMS:
+   - "Who's the best team?" → get_all_nba_teams(), then get_standings(), analyze top 3-5
+   - "Championship favorites?" → get_standings(), identify top 6 teams, get metrics for each
+   - "Top performers?" → get_standings() to find top teams, then get_top_performers for those teams
+   - "Best team right now?" → get_competitive_context() for top ranked teams
+   - Always use get_all_nba_teams() when you need to identify which teams to analyze
+
+8. When analyzing data, consider:
    - Current performance trends
    - Historical patterns
    - Statistical predictions

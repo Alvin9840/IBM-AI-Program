@@ -5,6 +5,15 @@
     "parameters": {},
     "returns": "List of dictionaries with id, full_name, abbreviation, city, nickname for all 30 NBA teams"
   },
+  "get_teams_by_rank": {
+    "tool": "data_tool",
+    "description": "Returns teams within a specific league ranking range with comprehensive performance data. Sorted by current league rank. Provides wins, losses, win percentage, performance metrics (scoring, margins, shooting), momentum scores, and trends. Use this to get top teams, championship contenders, or any rank-based subset.",
+    "parameters": {
+      "start_rank": "int (optional, default=1) - Starting league rank (1 = best team in league)",
+      "end_rank": "int (optional, default=5) - Ending league rank (inclusive)"
+    },
+    "returns": "List of team dictionaries sorted by rank, each containing: rank, team_name, wins, losses, win_pct, conference, games_back, performance (win_rate, avg_points, avg_margin, avg_fg_pct, consistency), momentum (score, sentiment, trend), recent_trend"
+  },
   "get_recent_games": {
     "tool": "data_tool",
     "description": "Get recent game results with detailed statistics including scores, shooting percentages, rebounds, assists, and turnovers. Essential for understanding current performance. Supports any NBA team.",

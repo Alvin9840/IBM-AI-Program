@@ -197,6 +197,7 @@ class CoordinatorAgent:
         If you have all the information needed to answer, provide a natural language response without any JSON.
         Be concise but comprehensive in your final answer.
         Do not give JSON outputs, rather the final analysis
+        ALWAYS call tools first THEN make analysis and decisions once you have enough data
 
         Your response:"""
             
