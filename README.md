@@ -188,7 +188,8 @@ WATSONX_PROJECT_ID=your_project_id_here
 4. Run the application:
 
 ```bash  
-python main.py
+python streamlit_frontend.py
+
 ```   
 
 ## 🎮 Usage
