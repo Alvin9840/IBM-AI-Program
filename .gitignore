@@ -2,3 +2,6 @@ ibm_env/
 .env
 *.pyc
 .DS_Store
+
+data/nba_chat_sessions.json
+

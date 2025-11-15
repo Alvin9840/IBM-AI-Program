@@ -1,4 +1,4 @@
-# NBA Fan Engagement AI Tool
+# NBA Marketing Agentic AI Dashboard
 
 An agentic AI system designed to revolutionize fan engagement for NBA marketing directors. This tool provides automated fan sentiment analysis, AI-driven event planning, and predictive trend forecasting to make planning easy and reliable.
 
@@ -167,7 +167,7 @@ graph TB
 1. Clone the repository
 
 ```bash
-git clone https://github.com/Alvin9840/IBM-AI-Program.git
+git clone https://github.com/Alvin9840/NBA-Marketing-AI-Dashboard.git
 ```
 
 2. Install dependencies:
